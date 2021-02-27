@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/server.js"
+    "start": "set PORT=5000 & set DEBUG=server,server:* & set NODE_ENV=development & nodemon src/server.js"
   },
   "keywords": [
     "Salary"
@@ -19,6 +19,7 @@
     "debug": "^4.3.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "fastest-validator": "^1.10.0",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.2.5",
     "sequelize": "^6.5.0"

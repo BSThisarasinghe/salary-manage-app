@@ -3,7 +3,7 @@ const debug = require('debug')('server');
 const chalk = require('chalk');
 const bodyParser = require('body-parser');
 const app = express();
-// const routes = require('./routes');
+const routes = require('./routes');
 
 const port = process.env.PORT || 5000;
 
@@ -11,16 +11,15 @@ const port = process.env.PORT || 5000;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-// app.use('/', routes);
+app.use('/', routes);
 
 app.get('/', (req, res) => {
-    //debug(req);
+    debug(chalk.green(req));
     res.send('Salary manage Backend! - GET');
 });
 
 app.post('/', (req, res) => {
-    debug(req);
-    console.log(req);
+    debug(chalk.green(req));
     res.send('Salary manage Backend! - POST');
 });
 
