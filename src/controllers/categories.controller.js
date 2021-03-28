@@ -47,12 +47,12 @@ function getMyCategoryList(req, res) {
         if (categories) {
             res.status(200).json({
                 message: 'Categories fetched succeesfully',
-                postList: categories
+                categoryList: categories
             })
         } else {
             res.status(200).json({
                 message: 'No categories yet',
-                postList: categories
+                categoryList: categories
             });
         }
     }).catch(err => {

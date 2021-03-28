@@ -6,21 +6,22 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const Validator = require("fastest-validator");
 
-function postMonth(req, res) {
-    const monthReq = {
-        month: req.body.month,
-        year: req.body.year,
-        user_id: req.user.userId
+function postIncome(req, res) {
+    const incomeReq = {
+        income: req.body.income,
+        amount: req.body.amount,
+        user_id: req.user.userId,
+        month_id: req.body.month_id
     };
 
     const schema = {
-        month: { type: "string", optional: false, min: 3, max: 100 },
-        year: { type: "string", optional: false, min: 3, max: 100 }
+        income: { type: "string", optional: false, min: 3, max: 100 },
+        amount: { type: "string", optional: false, min: 3, max: 100 }
     };
 
     const v = new Validator();
 
-    const validatorResponse = v.validate(monthReq, schema);
+    const validatorResponse = v.validate(incomeReq, schema);
 
     if (validatorResponse !== true) {
         return res.status(400).json({
@@ -29,10 +30,10 @@ function postMonth(req, res) {
         });
     }
 
-    models.months.create(monthReq).then(result => {
+    models.incomes.create(incomeReq).then(result => {
         res.status(201).json({
-            message: 'Month created',
-            month: result
+            message: 'Incomes created',
+            income: result
         })
     }).catch(error => {
         res.status(500).json({
@@ -42,17 +43,17 @@ function postMonth(req, res) {
     });
 }
 
-function getMyMonthList(req, res) {
-    return models.months.findAll({ where: { user_id: req.user.userId } }).then(months => {
-        if (months) {
+function getMyIncomeList(req, res) {
+    return models.incomes.findAll({ where: { user_id: req.user.userId } }).then(incomes => {
+        if (incomes) {
             res.status(200).json({
-                message: 'Months fetched succeesfully',
-                monthList: months
+                message: 'Incomes fetched succeesfully',
+                incomeList: incomes
             })
         } else {
             res.status(200).json({
-                message: 'No months yet',
-                monthList: months
+                message: 'No incomes yet',
+                incomeList: incomes
             });
         }
     }).catch(err => {
@@ -63,17 +64,17 @@ function getMyMonthList(req, res) {
     });
 }
 
-function getIndividualMonth(req, res) {
-    return models.months.findOne({ where: { id: req.params.id, user_id: req.user.userId } }).then(monthRes => {
-        if (monthRes) {
+function getIndividualIncome(req, res) {
+    return models.incomes.findOne({ where: { id: req.params.id, user_id: req.user.userId } }).then(incomeRes => {
+        if (incomeRes) {
             res.status(200).json({
-                message: 'Month fetched succeesfully',
-                month: monthRes
+                message: 'Income fetched succeesfully',
+                income: incomeRes
             })
         } else {
             res.status(200).json({
                 message: 'No data for the user',
-                month: monthRes
+                income: incomeRes
             });
         }
     }).catch(err => {
@@ -84,22 +85,22 @@ function getIndividualMonth(req, res) {
     });
 }
 
-function updateMonth(req, res) {
-    return models.months.findOne({ where: { id: req.params.id, user_id: req.user.userId }, limit: 1 }).then(monthRes => {
-        if (monthRes) {
-            let monthData = {
-                month: req.body.month,
-                year: req.body.year
+function updateIncome(req, res) {
+    return models.incomes.findOne({ where: { id: req.params.id, user_id: req.user.userId }, limit: 1 }).then(incomeRes => {
+        if (incomeRes) {
+            let incomeData = {
+                income: req.body.income,
+                amount: req.body.amount
             };
 
             const schema = {
-                month: { type: "string", optional: false, min: 3, max: 100 },
-                year: { type: "string", optional: false, min: 3, max: 100 }
+                income: { type: "string", optional: false, min: 3, max: 100 },
+                amount: { type: "string", optional: false, min: 3, max: 100 }
             };
 
             const v = new Validator();
 
-            const validatorResponse = v.validate(monthData, schema);
+            const validatorResponse = v.validate(incomeData, schema);
 
             if (validatorResponse !== true) {
                 return res.status(400).json({
@@ -107,7 +108,7 @@ function updateMonth(req, res) {
                     errors: validatorResponse
                 });
             }
-            return monthRes.update(monthData).then(response => {
+            return incomeRes.update(incomeData).then(response => {
                 console.log(response);
                 res.status(200).json({
                     message: 'Update successful',
@@ -121,8 +122,8 @@ function updateMonth(req, res) {
             });
         } else {
             res.status(200).json({
-                message: 'No month',
-                response: monthRes
+                message: 'No income',
+                response: incomeRes
             });
         }
     }).catch(err => {
@@ -133,17 +134,17 @@ function updateMonth(req, res) {
     });
 }
 
-function deleteMonth(req, res) {
-    return models.months.destroy({ where: { id: req.params.id, user_id: req.user.userId }, limit: 1 }).then(monthRes => {
-        if (monthRes) {
+function deleteIncome(req, res) {
+    return models.incomes.destroy({ where: { id: req.params.id, user_id: req.user.userId }, limit: 1 }).then(incomeRes => {
+        if (incomeRes) {
             res.status(200).json({
                 message: 'Deleted successfully',
-                response: monthRes
+                response: incomeRes
             });
         } else {
             res.status(200).json({
-                message: 'No month',
-                response: monthRes
+                message: 'No income',
+                response: incomeRes
             });
         }
     }).catch(err => {
@@ -155,9 +156,9 @@ function deleteMonth(req, res) {
 }
 
 module.exports = {
-    postMonth,
-    getMyMonthList,
-    getIndividualMonth,
-    updateMonth,
-    deleteMonth
+    postIncome,
+    getMyIncomeList,
+    getIndividualIncome,
+    updateIncome,
+    deleteIncome
 }
