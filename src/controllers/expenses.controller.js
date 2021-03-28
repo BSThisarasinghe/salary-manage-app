@@ -6,23 +6,26 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const Validator = require("fastest-validator");
 
-function postIncome(req, res) {
-    const incomeReq = {
-        income: req.body.income,
+function postExpense(req, res) {
+    const expenseReq = {
+        expense: req.body.expense,
         amount: req.body.amount,
         user_id: req.user.userId,
-        month_id: req.body.month_id
+        category_id: req.body.category_id,
+        month_id: req.body.month_id,
+        paid: req.body.paid
     };
 
     const schema = {
-        income: { type: "string", optional: false, min: 3, max: 100 },
+        expense: { type: "string", optional: false, min: 3, max: 100 },
         amount: { type: "string", optional: false, min: 3, max: 100 },
-        month_id: { type: "integer", optional: false }
+        category_id: { type: "number", optional: false },
+        month_id: { type: "number", optional: false }
     };
 
     const v = new Validator();
 
-    const validatorResponse = v.validate(incomeReq, schema);
+    const validatorResponse = v.validate(expenseReq, schema);
 
     if (validatorResponse !== true) {
         return res.status(400).json({
@@ -31,12 +34,13 @@ function postIncome(req, res) {
         });
     }
 
-    models.incomes.create(incomeReq).then(result => {
+    models.expenses.create(expenseReq).then(result => {
         res.status(201).json({
-            message: 'Incomes created',
-            income: result
+            message: 'Expenses created',
+            expense: result
         })
     }).catch(error => {
+        // console.log(error);
         res.status(500).json({
             message: 'Something Went Wrong',
             error: error
@@ -44,17 +48,17 @@ function postIncome(req, res) {
     });
 }
 
-function getMyIncomeList(req, res) {
-    return models.incomes.findAll({ where: { user_id: req.user.userId } }).then(incomes => {
-        if (incomes) {
+function getMyExpenseList(req, res) {
+    return models.expenses.findAll({ where: { user_id: req.user.userId } }).then(expenses => {
+        if (expenses) {
             res.status(200).json({
-                message: 'Incomes fetched succeesfully',
-                incomeList: incomes
+                message: 'Expenses fetched succeesfully',
+                incomeList: expenses
             })
         } else {
             res.status(200).json({
-                message: 'No incomes yet',
-                incomeList: incomes
+                message: 'No expenses yet',
+                incomeList: expenses
             });
         }
     }).catch(err => {
@@ -65,17 +69,17 @@ function getMyIncomeList(req, res) {
     });
 }
 
-function getIndividualIncome(req, res) {
-    return models.incomes.findOne({ where: { id: req.params.id, user_id: req.user.userId } }).then(incomeRes => {
-        if (incomeRes) {
+function getIndividualExpense(req, res) {
+    return models.expenses.findOne({ where: { id: req.params.id, user_id: req.user.userId } }).then(expenseRes => {
+        if (expenseRes) {
             res.status(200).json({
-                message: 'Income fetched succeesfully',
-                income: incomeRes
+                message: 'Expenses fetched succeesfully',
+                expense: expenseRes
             })
         } else {
             res.status(200).json({
                 message: 'No data for the user',
-                income: incomeRes
+                expense: expenseRes
             });
         }
     }).catch(err => {
@@ -86,22 +90,25 @@ function getIndividualIncome(req, res) {
     });
 }
 
-function updateIncome(req, res) {
-    return models.incomes.findOne({ where: { id: req.params.id, user_id: req.user.userId }, limit: 1 }).then(incomeRes => {
-        if (incomeRes) {
-            let incomeData = {
-                income: req.body.income,
-                amount: req.body.amount
+function updateExpense(req, res) {
+    return models.expenses.findOne({ where: { id: req.params.id, user_id: req.user.userId }, limit: 1 }).then(expenseRes => {
+        if (expenseRes) {
+            let expenseData = {
+                expense: req.body.expense,
+                amount: req.body.amount,
+                category_id: req.body.category_id,
+                paid: req.body.paid
             };
 
             const schema = {
-                income: { type: "string", optional: false, min: 3, max: 100 },
-                amount: { type: "string", optional: false, min: 3, max: 100 }
+                expense: { type: "string", optional: false, min: 3, max: 100 },
+                amount: { type: "string", optional: false, min: 3, max: 100 },
+                category_id: { type: "number", optional: false }
             };
 
             const v = new Validator();
 
-            const validatorResponse = v.validate(incomeData, schema);
+            const validatorResponse = v.validate(expenseData, schema);
 
             if (validatorResponse !== true) {
                 return res.status(400).json({
@@ -109,7 +116,7 @@ function updateIncome(req, res) {
                     errors: validatorResponse
                 });
             }
-            return incomeRes.update(incomeData).then(response => {
+            return expenseRes.update(expenseData).then(response => {
                 console.log(response);
                 res.status(200).json({
                     message: 'Update successful',
@@ -123,8 +130,8 @@ function updateIncome(req, res) {
             });
         } else {
             res.status(200).json({
-                message: 'No income',
-                response: incomeRes
+                message: 'No expense',
+                response: expenseRes
             });
         }
     }).catch(err => {
@@ -135,17 +142,17 @@ function updateIncome(req, res) {
     });
 }
 
-function deleteIncome(req, res) {
-    return models.incomes.destroy({ where: { id: req.params.id, user_id: req.user.userId }, limit: 1 }).then(incomeRes => {
-        if (incomeRes) {
+function deleteExpense(req, res) {
+    return models.expenses.destroy({ where: { id: req.params.id, user_id: req.user.userId }, limit: 1 }).then(expenseRes => {
+        if (expenseRes) {
             res.status(200).json({
                 message: 'Deleted successfully',
-                response: incomeRes
+                response: expenseRes
             });
         } else {
             res.status(200).json({
-                message: 'No income',
-                response: incomeRes
+                message: 'No expense',
+                response: expenseRes
             });
         }
     }).catch(err => {
@@ -157,9 +164,9 @@ function deleteIncome(req, res) {
 }
 
 module.exports = {
-    postIncome,
-    getMyIncomeList,
-    getIndividualIncome,
-    updateIncome,
-    deleteIncome
+    postExpense,
+    getMyExpenseList,
+    getIndividualExpense,
+    updateExpense,
+    deleteExpense
 }
