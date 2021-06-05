@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      expenses.belongsTo(models.categories, { foreignKey: 'category_id', as: 'categories', onDelete: 'SET NULL' });
     }
   };
   expenses.init({

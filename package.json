@@ -13,15 +13,20 @@
   "author": "Buwaneka Sudheera",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.19.0",
     "chalk": "^4.1.0",
+    "cheerio": "^1.0.0-rc.9",
+    "circular-json": "^0.5.9",
     "debug": "^4.3.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "fastest-validator": "^1.10.0",
+    "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.2.5",
+    "sequeliseed": "^1.0.7",
     "sequelize": "^6.5.0"
   },
   "devDependencies": {

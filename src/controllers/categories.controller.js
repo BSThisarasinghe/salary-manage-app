@@ -154,10 +154,40 @@ function deleteCategory(req, res) {
     });
 }
 
+function getCategoryDetails(req, res) {
+    return models.categories.findAll({
+        where: {
+            user_id: req.user.userId
+        },
+        include: [{
+            model: models.expenses, as: 'expenses',
+            attributes: ['expense', 'amount']
+        }]
+    }).then(categories => {
+        if (categories) {
+            res.status(200).json({
+                message: 'Categories fetched succeesfully',
+                categoryList: categories
+            })
+        } else {
+            res.status(200).json({
+                message: 'No categories yet',
+                categoryList: categories
+            });
+        }
+    }).catch(err => {
+        res.status(500).json({
+            message: 'Something Went Wrong',
+            error: err
+        });
+    });
+}
+
 module.exports = {
     postCategories,
     getMyCategoryList,
     getIndividualCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    getCategoryDetails
 }

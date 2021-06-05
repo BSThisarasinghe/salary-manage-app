@@ -154,10 +154,43 @@ function deleteMonth(req, res) {
     });
 }
 
+function getMonthDetails(req, res) {
+    return models.months.findAll({
+        where: {
+            user_id: req.user.userId
+        },
+        include: [{
+            model: models.expenses, as: 'expenses',
+            attributes: ['expense', 'amount']
+        },{
+            model: models.incomes, as: 'incomes',
+            attributes: ['income', 'amount']
+        }]
+    }).then(months => {
+        if (months) {
+            res.status(200).json({
+                message: 'Months fetched succeesfully',
+                monthList: months
+            })
+        } else {
+            res.status(200).json({
+                message: 'No months yet',
+                monthList: months
+            });
+        }
+    }).catch(err => {
+        res.status(500).json({
+            message: 'Something Went Wrong',
+            error: err
+        });
+    });
+}
+
 module.exports = {
     postMonth,
     getMyMonthList,
     getIndividualMonth,
     updateMonth,
-    deleteMonth
+    deleteMonth,
+    getMonthDetails
 }

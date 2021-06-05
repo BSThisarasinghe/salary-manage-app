@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      categories.hasMany(models.expenses, { foreignKey: 'category_id', as: 'expenses', onDelete: 'SET NULL' });
+
     }
   };
   categories.init({

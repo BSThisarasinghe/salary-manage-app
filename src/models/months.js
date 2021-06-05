@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      months.hasMany(models.incomes, { foreignKey: 'month_id', as: 'incomes', onDelete: 'SET NULL' });
+      // models.incomes.belongsTo(models.months, { foreignKey: 'month_id', as: 'months', onDelete: 'SET NULL' });
+      months.hasMany(models.expenses, { foreignKey: 'month_id', as: 'expenses', onDelete: 'SET NULL' });
+      // models.expenses.belongsTo(models.months, { foreignKey: 'month_id', as: 'months', onDelete: 'SET NULL' });
     }
   };
   months.init({

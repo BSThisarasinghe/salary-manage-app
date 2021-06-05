@@ -8,5 +8,6 @@ router.get('/monthlist', auth.authenticateToken, monthsController.getMyMonthList
 router.get('/month/:id', auth.authenticateToken, monthsController.getIndividualMonth);
 router.put('/month/:id', auth.authenticateToken, monthsController.updateMonth);
 router.delete('/month/:id', auth.authenticateToken, monthsController.deleteMonth);
+router.get('/monthdetails', auth.authenticateToken, monthsController.getMonthDetails);
 
 module.exports = router;
