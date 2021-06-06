@@ -83,7 +83,7 @@ function siginIn(req, res) {
                     debug(chalk.green(userObj));
 
                     const accessToken = generateAccessToken(userObj);
-
+                    let expireTime = new Date(new Date().setHours(new Date().getHours() + 1));
                     const refreshToken = jwt.sign(
                         userObj,
                         process.env.REFRESH_KEY
@@ -92,6 +92,7 @@ function siginIn(req, res) {
                         return res.status(200).json({
                             message: 'Authentication successful',
                             accessToken: accessToken,
+                            expireTime: expireTime,
                             response: response
                         });
                     }).catch(err => {
@@ -156,7 +157,8 @@ function getToken(req, res) {
                 jwt.verify(refreshToken, process.env.REFRESH_KEY, (err, user) => {
                     if (err) {
                         return res.status(403).json({
-                            message: 'Forbidden'
+                            message: 'Forbidden',
+                            error: err
                         });
                     }
 
@@ -165,11 +167,12 @@ function getToken(req, res) {
                         userId: user.id,
                         name: user.name
                     };
-
+                    let expireTime = new Date(new Date().setHours(new Date().getHours() + 1));
                     const accessToken = generateAccessToken(userObj);
 
                     return res.json({
-                        accessToken: accessToken
+                        accessToken: accessToken,
+                        expireTime: expireTime
                     });
                 });
             } else {
