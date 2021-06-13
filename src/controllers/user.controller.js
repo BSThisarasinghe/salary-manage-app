@@ -206,9 +206,21 @@ function signOut(req, res) {
     })
 }
 
+async function checkUniqueEmail(req, res) {
+    return models.users.count({ where: { email: req.params.email } }).then(count => {
+        let isValueUnique = (count > 0) ? false : true;
+        res.status(200).json({
+            isValueUnique: isValueUnique
+        });
+    }).catch(err => {
+        return err;
+    });
+}
+
 module.exports = {
     postUsers,
     siginIn,
     getToken,
-    signOut
+    signOut,
+    checkUniqueEmail
 }
