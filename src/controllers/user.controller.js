@@ -217,10 +217,30 @@ async function checkUniqueEmail(req, res) {
     });
 }
 
+async function getUserProfile(req, res) {
+    return models.users.findOne({
+        where: {
+            id: req.user.userId
+        },
+        attributes: ['name', 'email']
+    }).then(user => {
+        if (user) {
+            res.status(200).json(user);
+        } else {
+            return res.status(401).json({
+                message: 'Authentication failed',
+            });
+        }
+    }).catch(err => {
+        return err;
+    });
+}
+
 module.exports = {
     postUsers,
     siginIn,
     getToken,
     signOut,
-    checkUniqueEmail
+    checkUniqueEmail,
+    getUserProfile
 }
