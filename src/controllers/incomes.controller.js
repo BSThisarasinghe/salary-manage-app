@@ -17,7 +17,7 @@ function postIncome(req, res) {
     const schema = {
         income: { type: "string", optional: false, min: 3, max: 100 },
         amount: { type: "string", optional: false, min: 3, max: 100 },
-        month_id: { type: "integer", optional: false }
+        month_id: { type: "number", optional: false }
     };
 
     const v = new Validator();

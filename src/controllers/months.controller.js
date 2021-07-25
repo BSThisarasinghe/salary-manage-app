@@ -1,4 +1,5 @@
 const models = require('../models');
+var _ = require('lodash');
 const bcrypt = require('bcrypt-nodejs');
 const debug = require('debug')('server');
 const chalk = require('chalk');
@@ -155,27 +156,41 @@ function deleteMonth(req, res) {
 }
 
 function getMonthDetails(req, res) {
-    return models.months.findAll({
-        where: {
+    let where;
+    if (req.params.month_id !== 'LATEST') {
+        where = {
+            user_id: req.user.userId,
+            id: req.params.month_id
+        };
+    } else {
+        where = {
             user_id: req.user.userId
-        },
+        };
+    }
+    return models.months.findOne({
+        where: where,
+        order: [['createdAt', 'DESC']],
         include: [{
             model: models.expenses, as: 'expenses',
-            attributes: ['expense', 'amount']
-        },{
+            attributes: ['id', 'expense', 'amount', 'paid'],
+            include: [{
+                model: models.categories, as: 'categories',
+                attributes: ['id', 'name']
+            }]
+        }, {
             model: models.incomes, as: 'incomes',
-            attributes: ['income', 'amount']
+            attributes: ['id', 'income', 'amount']
         }]
     }).then(months => {
         if (months) {
             res.status(200).json({
                 message: 'Months fetched succeesfully',
-                monthList: months
+                data: expenseCategpryTransform(months)
             })
         } else {
             res.status(200).json({
                 message: 'No months yet',
-                monthList: months
+                data: months
             });
         }
     }).catch(err => {
@@ -184,6 +199,67 @@ function getMonthDetails(req, res) {
             error: err
         });
     });
+}
+
+function expenseCategpryTransform(months) {
+    console.log('IN transformation');
+    var destination = [];
+
+    // _.forEach(months, function (month) {
+
+    // get the current month from destination
+    let currentMonth = _.find(destination.months, _.matchesProperty('id', months.id));
+    if (currentMonth === undefined) {
+        // month not in the destination
+        //console.log('tanant not in the list');
+        currentMonth = {
+            'id': months.id,
+            'month': months.month,
+            'year': months.year,
+            "user_id": months.user_id,
+            'createdAt': months.createdAt,
+            "updatedAt": months.updatedAt,
+            "incomes": months.incomes,
+            'categories': []
+        };
+        destination.push(currentMonth);
+    }
+
+    _.forEach(months.expenses, function (expense) {
+        //loop through widgets in the current month
+        const catagoryId = expense.categories.id;
+
+        //check catagory exist in the currentMonth
+        let currentCategory = _.find(currentMonth.categories, _.matchesProperty('id', catagoryId));
+        if (currentCategory === undefined) {
+            //category not exist
+            currentCategory = {
+                'id': expense.categories.id,
+                'name': expense.categories.name,
+                'expenses': []
+            }
+
+            currentMonth.categories.push(currentCategory);
+        }
+
+        const expenseUUID = expense.id;
+        let currentExpense = _.find(currentCategory.widgets, _.matchesProperty('uuid', expenseUUID));
+
+        if (currentExpense === undefined) {
+            currentExpense = {
+                'id': expense.id,
+                'expense': expense.expense,
+                'amount': expense.amount,
+                'paid': expense.paid
+            }
+
+        }
+
+        currentCategory.expenses.push(currentExpense);
+    });
+    // });
+
+    return destination;
 }
 
 module.exports = {
